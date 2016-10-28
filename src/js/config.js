@@ -3,7 +3,7 @@
   'use strict';
 
   angular
-    .module('myApp.config', [])
+    .module('mlbApp.config', [])
     .config(appConfig)
     .run(function($templateCache) {
       $templateCache.removeAll();
