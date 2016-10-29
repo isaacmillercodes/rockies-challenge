@@ -6,9 +6,9 @@
     .module('mlbApp.components.main')
     .controller('mainController', mainController);
 
-  mainController.$inject = ['MainService'];
+  mainController.$inject = ['MainService', 'moment'];
 
-  function mainController(MainService) {
+  function mainController(MainService, moment) {
     /*jshint validthis: true */
     const vm = this;
 
@@ -35,92 +35,119 @@
 
     initTeams(vm.finalResults);
 
+    // calcSeasonTotals();
     //calculating visits
 
-    MainService.getGamesForDay('04', '03')
-      .then(results => {
-        let gamesArray = results.data.data.games.game;
+    // let start = moment("20160403", "YYYYMMDD");
+    //
+    // let counter = 0;
+    //
+    // for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
+    //   let today = i.format().split('-');
+    //   let nice = today[2].split('T');
+    //   console.log(today[0], today[1], nice[0]);
+    //   counter++;
+    // }
+    //
+    // console.log(counter);
 
-        if (gamesArray) {
 
-          gamesArray.forEach((game, index) => {
+      for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
+        let date = i.format().split('-');
+        let dayTime = date[2].split('T');
 
-            if (game.game_type !== 'R' || game.status !== 'Final') {
-              gamesArray.splice(index, 1);
-            }
+        let month = date[1];
 
-            let gameDataUrl = gamesArray[index].game_data_directory;
+        let day = dayTime[0];
 
-            let gameHomeTeam = gamesArray[index].home_team_name;
+        MainService.getGamesForDay(month, day)
+          .then(results => {
+            let gamesArray = results.data.data.games.game;
 
-            let gameAwayTeam = gamesArray[index].away_team_name;
+            if (gamesArray) {
 
-            MainService.getGameStats(gameDataUrl)
-              .then(gameData => {
-                let game = gameData.data.data.game;
+              gamesArray.forEach((game, index) => {
 
-                let homeTeam;
-                let awayTeam;
-                let homeLeague;
-                let awayLeague;
-
-                for (var i = 0; i < vm.finalResults.length; i++) {
-                  if (vm.finalResults[i].name === gameHomeTeam) {
-                    homeTeam = vm.finalResults[i];
-                  }
-                  if (vm.finalResults[i].name === gameAwayTeam) {
-                    awayTeam = vm.finalResults[i];
-                  }
+                if (game.game_type !== 'R' || game.status !== 'Final') {
+                  gamesArray.splice(index, 1);
                 }
 
-                if (homeTeam.league === 'AL') {
-                  homeLeague = vm.finalResults[1];
-                } else {
-                  homeLeague = vm.finalResults[2];
-                }
+                let gameDataUrl = gamesArray[index].game_data_directory;
 
-                if (awayTeam.league === 'AL') {
-                  awayLeague = vm.finalResults[1];
-                } else {
-                  awayLeague = vm.finalResults[2];
-                }
+                let gameHomeTeam = gamesArray[index].home_team_name;
 
-                // console.log(homeTeam.name, homeLeague.name, awayTeam.name, awayLeague.name);
+                let gameAwayTeam = gamesArray[index].away_team_name;
 
-                game.inning.forEach(inning => {
-                  let actionBot = inning.bottom.action;
-                  let actionTop = inning.top.action;
+                MainService.getGameStats(gameDataUrl)
+                  .then(gameData => {
+                    let game = gameData.data.data.game;
 
-                  if (actionBot) {
-                    if (!actionBot.length) {
-                      translateAction(vm.finalResults[0], awayTeam, awayLeague, actionBot);
-                    } else {
-                      actionBot.forEach(action => {
-                        translateAction(vm.finalResults[0], awayTeam, awayLeague, action);
-                      });
+                    let homeTeam;
+                    let awayTeam;
+                    let homeLeague;
+                    let awayLeague;
 
+                    for (var i = 0; i < vm.finalResults.length; i++) {
+                      if (vm.finalResults[i].name === gameHomeTeam) {
+                        homeTeam = vm.finalResults[i];
+                      }
+                      if (vm.finalResults[i].name === gameAwayTeam) {
+                        awayTeam = vm.finalResults[i];
+                      }
                     }
-                  }
 
-                  if (actionTop) {
-                    if (!actionTop.length) {
-                      translateAction(vm.finalResults[0], homeTeam, homeLeague, actionTop);
+                    if (homeTeam.league === 'AL') {
+                      homeLeague = vm.finalResults[1];
                     } else {
-                      actionTop.forEach(action => {
-                        translateAction(vm.finalResults[0], homeTeam, homeLeague, action);
-                      });
-
+                      homeLeague = vm.finalResults[2];
                     }
-                  }
+
+                    if (awayTeam.league === 'AL') {
+                      awayLeague = vm.finalResults[1];
+                    } else {
+                      awayLeague = vm.finalResults[2];
+                    }
+
+                    // console.log(homeTeam.name, homeLeague.name, awayTeam.name, awayLeague.name);
+
+                    game.inning.forEach(inning => {
+                      let actionBot = inning.bottom.action;
+                      let actionTop = inning.top.action;
+
+                      if (actionBot) {
+                        if (!actionBot.length) {
+                          translateAction(vm.finalResults[0], awayTeam, awayLeague, actionBot);
+                        } else {
+                          actionBot.forEach(action => {
+                            translateAction(vm.finalResults[0], awayTeam, awayLeague, action);
+                          });
+
+                        }
+                      }
+
+                      if (actionTop) {
+                        if (!actionTop.length) {
+                          translateAction(vm.finalResults[0], homeTeam, homeLeague, actionTop);
+                        } else {
+                          actionTop.forEach(action => {
+                            translateAction(vm.finalResults[0], homeTeam, homeLeague, action);
+                          });
+
+                        }
+                      }
 
 
-                });
+                    });
+
+                  });
 
               });
+            }
 
           });
-        }
-      });
+      //loop ends for day
+
+    }
 
     //helper functions
 

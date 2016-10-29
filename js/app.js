@@ -6,6 +6,7 @@
 
   angular
     .module('mlbApp', [
+      'angularMoment',
       'mlbApp.config',
       'mlbApp.components.main'
     ]);
