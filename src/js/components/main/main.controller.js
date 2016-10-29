@@ -6,9 +6,9 @@
     .module('mlbApp.components.main')
     .controller('mainController', mainController);
 
-  mainController.$inject = ['MainService'];
+  mainController.$inject = ['MainService', 'HelperService'];
 
-  function mainController(MainService) {
+  function mainController(MainService, HelperService) {
     /*jshint validthis: true */
     const vm = this;
 
@@ -16,19 +16,24 @@
       constructor(name, league) {
         this.name = name;
         this.league = league;
-        this.totalVisits = 0;
-        this.totalVisitsOnly = 0;
+
+        this.totalAllVisits = 0;
+        this.avgAllVisitsPerGame = 0;
+        this.avgInningFirstAnyVisit = 0;
+
         this.totalChangesOnly = 0;
-        this.avgVisitsPerGame = 0;
-        this.avgInningFirstVisit = 0;
+        this.avgChangesPerGame = 0;
+        this.avgInningFirstChange = 0;
+
+        this.totalPureVisits = 0;
+        this.avgPureVisitsPerGame = 0;
+        this.avgInningFirstPureVisit = 0;
       }
     }
 
-    vm.resultsArray = [new ResultObject('Major League Baseball', 'MLB'), new ResultObject('American League', 'AL'), new ResultObject('National League', 'NL')];
+    vm.finalResults = [new ResultObject('Major League Baseball', 'MLB'), new ResultObject('American League', 'AL'), new ResultObject('National League', 'NL')];
 
-    initTeams(vm.resultsArray);
-
-
+    initTeams(vm.finalResults);
 
     //helper functions
 
@@ -70,7 +75,7 @@
             if (!matchingAwayTeam) {
               array.push(new ResultObject(game.away_team_name, teamLeague));
             }
-            
+
           });
         }
         return array;
