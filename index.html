@@ -11,27 +11,47 @@
     <h1>Visits to the Mound 2016 MLB Regular Season</h1>
     <div class="container">
       <div ng-controller="mainController as mainCtrl" class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-striped table-bordered">
           <thead>
+            <tr>
+              <th colspan="2"></th>
+              <th colspan="3">All Visits</th>
+              <th colspan="3">Only Pitching Changes</th>
+              <th colspan="3">Only Visits Without Pitching Change</th>
+            </tr>
             <tr>
               <th>Name<br></th>
               <th>League<br></th>
-              <th>Total Visits to the Mound</th>
-              <th>Total Visits Without Pitching Change</th>
-              <th>Total Pitching Changes</th>
-              <th>Average Visits Per Game</th>
-              <th>Average Inning of First Visit</th>
+
+              <th>Total</th>
+              <th>Per Game</th>
+              <th>First Visit</th>
+
+              <th>Total</th>
+              <th>Per Game</th>
+              <th>First Change</th>
+
+              <th>Total</th>
+              <th>Per Game</th>
+              <th>First Visit</th>
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="team in mainCtrl.resultsArray">
+            <tr ng-repeat="team in mainCtrl.finalResults">
               <td>{{team.name}}</td>
               <td>{{team.league}}</td>
-              <td>{{team.totalVisits}}</td>
-              <td>{{team.totalVisitsOnly}}</td>
+
+              <td>{{team.totalAllVisits}}</td>
+              <td>{{team.avgAllVisitsPerGame}}</td>
+              <td>{{team.avgInningFirstAnyVisit}}</td>
+
               <td>{{team.totalChangesOnly}}</td>
-              <td>{{team.avgVisitsPerGame}}</td>
-              <td>{{team.avgInningFirstVisit}}</td>
+              <td>{{team.avgChangesPerGame}}</td>
+              <td>{{team.avgInningFirstChange}}</td>
+
+              <td>{{team.totalPureVisits}}</td>
+              <td>{{team.avgPureVisitsPerGame}}</td>
+              <td>{{team.avgInningFirstPureVisit}}</td>
             </tr>
           </tbody>
         </table>
@@ -46,6 +66,8 @@
     <!-- main component -->
     <script type="text/javascript" src="js/components/main/main.config.js"></script>
     <script type="text/javascript" src="js/components/main/main.service.js"></script>
+    <script type="text/javascript" src="js/components/main/helper.service.js"></script>
+    <script type="text/javascript" src="js/components/main/main.factory.js"></script>
     <script type="text/javascript" src="js/components/main/main.controller.js"></script>
   </body>
 </html>
