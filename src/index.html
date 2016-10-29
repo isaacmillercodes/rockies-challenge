@@ -17,9 +17,9 @@
           <thead>
             <tr>
               <th colspan="2"></th>
-              <th colspan="3">All Visits</th>
-              <th colspan="3">Only Pitching Changes</th>
-              <th colspan="3">Visits Without Pitching Change</th>
+              <th colspan="2">All Visits</th>
+              <th colspan="2">Only Pitching Changes</th>
+              <th colspan="2">Visits Without Pitching Change</th>
             </tr>
             <tr>
               <th>Name<br></th>
@@ -27,34 +27,28 @@
 
               <th>Total</th>
               <th>Per Game</th>
-              <th>First Visit</th>
 
               <th>Total</th>
               <th>Per Game</th>
-              <th>First Change</th>
 
               <th>Total</th>
               <th>Per Game</th>
-              <th>First Visit</th>
+
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="team in mainCtrl.finalResults">
-              {{team}}
+            <tr ng-repeat="team in mainCtrl.finalResults | orderBy:'-totalAllVisits'">
               <td>{{team.name}}</td>
               <td>{{team.league}}</td>
 
               <td>{{team.totalAllVisits}}</td>
               <td>{{team.avgAllVisitsPerGame}}</td>
-              <td>{{team.avgInningFirstAnyVisit}}</td>
 
               <td>{{team.totalChangesOnly}}</td>
               <td>{{team.avgChangesPerGame}}</td>
-              <td>{{team.avgInningFirstChange}}</td>
 
               <td>{{team.totalPureVisits}}</td>
               <td>{{team.avgPureVisitsPerGame}}</td>
-              <td>{{team.avgInningFirstPureVisit}}</td>
             </tr>
           </tbody>
         </table>

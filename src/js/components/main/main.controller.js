@@ -35,23 +35,11 @@
 
     initTeams(vm.finalResults);
 
-    // calcSeasonTotals();
-    //calculating visits
+    calcSeasonTotals();
 
-    // let start = moment("20160403", "YYYYMMDD");
-    //
-    // let counter = 0;
-    //
-    // for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
-    //   let today = i.format().split('-');
-    //   let nice = today[2].split('T');
-    //   console.log(today[0], today[1], nice[0]);
-    //   counter++;
-    // }
-    //
-    // console.log(counter);
+    //helper functions
 
-
+    function calcSeasonTotals() {
       for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
         let date = i.format().split('-');
         let dayTime = date[2].split('T');
@@ -146,10 +134,8 @@
 
           });
       //loop ends for day
-
+      }
     }
-
-    //helper functions
 
     function initTeams(inputArray) {
       MainService.getGamesForDay('10', '02')
