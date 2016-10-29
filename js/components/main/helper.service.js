@@ -10,7 +10,7 @@
 
   function HelperService() {
     /*jshint validthis: true */
-    
+
   }
 
 })();

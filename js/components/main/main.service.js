@@ -17,7 +17,7 @@
       return $http.get(`${calendarUrl}month_${month}/day_${day}/miniscoreboard.json`);
     };
 
-    this.getGameData = (gameDataUrl) => {
+    this.getGameStats = (gameDataUrl) => {
       return $http.get(`${baseUrl}${gameDataUrl}/game_events.json`);
     };
   }
