@@ -2,16 +2,39 @@
 <html lang="en" ng-app="mlbApp">
   <head>
     <meta charset="utf-8">
-    <title>Untitled</title>
+    <title>Visits to the Mound</title>
     <!-- styles -->
     <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
   </head>
   <body ng-cloak>
-    <!-- sample angular code -->
+    <h1>Visits to the Mound 2016 MLB Regular Season</h1>
     <div class="container">
-      <div ng-controller="mainController as mainCtrl">
-        <p>{{ mainCtrl.greeting }}</p>
+      <div ng-controller="mainController as mainCtrl" class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name<br></th>
+              <th>League<br></th>
+              <th>Total Visits to the Mound</th>
+              <th>Total Visits Without Pitching Change</th>
+              <th>Total Pitching Changes</th>
+              <th>Average Visits Per Game</th>
+              <th>Average Inning of First Visit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="team in mainCtrl.resultsArray">
+              <td>{{team.name}}</td>
+              <td>{{team.league}}</td>
+              <td>{{team.totalVisits}}</td>
+              <td>{{team.totalVisitsOnly}}</td>
+              <td>{{team.totalChangesOnly}}</td>
+              <td>{{team.avgVisitsPerGame}}</td>
+              <td>{{team.avgInningFirstVisit}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <!-- scripts -->
