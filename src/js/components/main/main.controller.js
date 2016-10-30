@@ -19,23 +19,20 @@
 
         this.totalAllVisits = 0;
         this.avgAllVisitsPerGame = 0;
-        this.avgInningFirstAnyVisit = 0;
 
         this.totalChangesOnly = 0;
         this.avgChangesPerGame = 0;
-        this.avgInningFirstChange = 0;
 
         this.totalPureVisits = 0;
         this.avgPureVisitsPerGame = 0;
-        this.avgInningFirstPureVisit = 0;
       }
     }
 
     vm.finalResults = [new ResultObject('Major League Baseball', 'MLB'), new ResultObject('American League', 'AL'), new ResultObject('National League', 'NL')];
 
     initTeams(vm.finalResults);
-
     calcSeasonTotals();
+    // calcAverages(vm.finalResults);
 
     //helper functions
 
@@ -131,10 +128,29 @@
 
               });
             }
-
+          //loop ends for day
           });
-      //loop ends for day
       }
+    }
+
+    function calcAverages(inputArray) {
+      inputArray.forEach(team => {
+        if (team.name === 'Major League Baseball') {
+          team.avgAllVisitsPerGame = team.totalAllVisits/4860;
+          team.avgChangesPerGame = team.totalChangesOnly/4860;
+          team.avgPureVisitsPerGame = team.totalPureVisits/4860;
+        } else if (team.name === 'National League' || team.name === 'American League') {
+          team.avgAllVisitsPerGame = 11;
+          team.avgChangesPerGame = 22;
+          team.avgPureVisitsPerGame = 33;
+        } else {
+          team.avgAllVisitsPerGame = 111;
+          team.avgChangesPerGame = 222;
+          team.avgPureVisitsPerGame = 333;
+
+        }
+      });
+
     }
 
     function initTeams(inputArray) {
