@@ -36,8 +36,8 @@
 
             </tr>
           </thead>
-          <tbody>
-            <tr ng-repeat="team in mainCtrl.finalResults | orderBy:'-totalAllVisits'">
+          <tbody ng-repeat="team in mainCtrl.finalResults | orderBy:'-totalAllVisits'">
+            <tr>
               <td>{{team.name}}</td>
               <td>{{team.league}}</td>
 
