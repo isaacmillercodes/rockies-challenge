@@ -10,7 +10,6 @@
 
   function ResultFactory() {
     /*jshint validthis: true */
-    
   }
 
 })();
