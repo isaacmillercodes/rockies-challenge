@@ -136,9 +136,9 @@
     function calcAverages(inputArray) {
       inputArray.forEach(team => {
         if (team.name === 'Major League Baseball') {
-          team.avgAllVisitsPerGame = team.totalAllVisits/4860;
-          team.avgChangesPerGame = team.totalChangesOnly/4860;
-          team.avgPureVisitsPerGame = team.totalPureVisits/4860;
+          team.avgAllVisitsPerGame = team.totalAllVisits / 4860;
+          team.avgChangesPerGame = team.totalChangesOnly / 4860;
+          team.avgPureVisitsPerGame = team.totalPureVisits / 4860;
         } else if (team.name === 'National League' || team.name === 'American League') {
           team.avgAllVisitsPerGame = 11;
           team.avgChangesPerGame = 22;
