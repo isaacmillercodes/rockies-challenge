@@ -25,18 +25,18 @@
       }
     }
 
-    let teamsArray = [new ResultObject('Major League Baseball', 'MLB'), new ResultObject('American League', 'AL'), new ResultObject('National League', 'NL')];
-
-    let getTeams = initTeams(teamsArray);
-    let getTotals = calcSeasonTotals(teamsArray);
+    let getTeams = initTeams();
+    // let getTotals = calcSeasonTotals(teamsArray);
 
 
     Promise.all([
-      getTeams,
-      getTotals
+      getTeams
     ])
     .then(results => {
-      vm.finalResults = results[1];
+      return calcSeasonTotals(results[0]);
+    })
+    .then(seasonTotals => {
+      vm.finalResults = seasonTotals;
     });
 
     // calcSeasonTotals(teamsArray);
@@ -169,51 +169,45 @@
       });
     }
 
-    function initTeams(inputArray) {
+    function initTeams() {
       return new Promise((resolve, reject) => {
+        let finalResults = [new ResultObject('Major League Baseball', 'MLB'), new ResultObject('American League', 'AL'), new ResultObject('National League', 'NL')];
         MainService.getGamesForDay('10', '02')
         .then(results => {
+
           let gamesArray = results.data.data.games.game;
+
           if (gamesArray.length) {
             gamesArray.forEach(game => {
 
               let leagueInfo = game.league;
 
-              let teamLeague;
-
-              if (leagueInfo[0] === 'A') {
-                teamLeague = 'AL';
-              } else {
-                teamLeague = 'NL';
-              }
+              let homeTeamLeague;
+              let awayTeamLeague;
 
               if (leagueInfo[1] === 'A') {
-                teamLeague = 'AL';
+                homeTeamLeague = 'AL';
               } else {
-                teamLeague = 'NL';
+                homeTeamLeague = 'NL';
               }
 
-              let matchingHomeTeam = inputArray.filter(team => {
-                return team.name === game.home_team_name;
-              })[0];
-
-              let matchingAwayTeam = inputArray.filter(team => {
-                return team.name === game.away_team_name;
-              })[0];
-
-              if (!matchingHomeTeam) {
-                inputArray.push(new ResultObject(game.home_team_name, teamLeague));
+              if (leagueInfo[0] === 'A') {
+                awayTeamLeague = 'AL';
+              } else {
+                awayTeamLeague = 'NL';
               }
 
-              if (!matchingAwayTeam) {
-                inputArray.push(new ResultObject(game.away_team_name, teamLeague));
-              }
+              let homeTeam = game.home_team_name;
+              let awayTeam = game.away_team_name;
+
+              finalResults.push(new ResultObject(homeTeam, homeTeamLeague));
+              finalResults.push(new ResultObject(awayTeam, awayTeamLeague));
 
             });
           }
 
         });
-        resolve(inputArray);
+        resolve(finalResults);
       });
     }
 
