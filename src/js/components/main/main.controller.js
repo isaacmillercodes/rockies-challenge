@@ -18,34 +18,26 @@
         this.league = league;
 
         this.totalAllVisits = 0;
-        this.avgAllVisitsPerGame = 0;
 
         this.totalChangesOnly = 0;
-        this.avgChangesPerGame = 0;
 
         this.totalPureVisits = 0;
-        this.avgPureVisitsPerGame = 0;
       }
     }
 
     let teamsArray = [new ResultObject('Major League Baseball', 'MLB'), new ResultObject('American League', 'AL'), new ResultObject('National League', 'NL')];
 
     let getTeams = initTeams(teamsArray);
-    // let getTotals = calcSeasonTotals(teamsArray);
-    // let getAverages = calcAverages(teamsArray);
+    let getTotals = calcSeasonTotals(teamsArray);
 
-    // Promise.all([
-    //   getTeams,
-    //   getTotals,
-    //   getAverages
-    // ])
-    // .then(results => {
-    //   // vm.finalResults = teamsArray;
-    //   console.log('yaaas');
-    //   console.log(results);
-    //
-    //   // vm.finalResults = results[2];
-    // });
+
+    Promise.all([
+      getTeams,
+      getTotals
+    ])
+    .then(results => {
+      vm.finalResults = results[1];
+    });
 
     // calcSeasonTotals(teamsArray);
     // calcAverages(teamsArray);
@@ -54,145 +46,122 @@
 
     //helper functions
 
-    let seasonDates = getSeasonDates();
+    function calcSeasonTotals(inputArray) {
+      return new Promise((resolve, reject) => {
 
-    console.log(seasonDates);
+        for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
 
-    function getSeasonDates() {
-      let seasonDates = [];
+          let date = i.format().split('-');
+          let dayTime = date[2].split('T');
 
-      for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
+          let month = date[1];
 
-        let today = [];
+          let day = dayTime[0];
 
-        let date = i.format().split('-');
-        let dayTime = date[2].split('T');
+          MainService.getGamesForDay(month, day)
+            .then(results => {
+              let gamesArray = results.data.data.games.game;
 
-        today.push(date[1]);
+              if (gamesArray) {
 
-        today.push(dayTime[0]);
+                gamesArray.forEach((game, index) => {
 
-        seasonDates.push(today);
-      }
-      return seasonDates;
+                  if (game.game_type !== 'R' || game.status !== 'Final') {
+                    gamesArray.splice(index, 1);
+                  }
+
+                  let gameDataUrl = gamesArray[index].game_data_directory;
+
+                  let gameHomeTeam = gamesArray[index].home_team_name;
+
+                  let gameAwayTeam = gamesArray[index].away_team_name;
+
+                  MainService.getGameStats(gameDataUrl)
+                    .then(gameData => {
+                      let game = gameData.data.data.game;
+
+                      let homeTeam;
+                      let awayTeam;
+                      let homeLeague;
+                      let awayLeague;
+
+                      for (var i = 0; i < inputArray.length; i++) {
+                        if (inputArray[i].name === gameHomeTeam) {
+                          homeTeam = inputArray[i];
+                        }
+                        if (inputArray[i].name === gameAwayTeam) {
+                          awayTeam = inputArray[i];
+                        }
+                      }
+
+                      if (homeTeam.league === 'AL') {
+                        homeLeague = inputArray[1];
+                      } else {
+                        homeLeague = inputArray[2];
+                      }
+
+                      if (awayTeam.league === 'AL') {
+                        awayLeague = inputArray[1];
+                      } else {
+                        awayLeague = inputArray[2];
+                      }
+
+                      game.inning.forEach(inning => {
+                        let actionBot = inning.bottom.action;
+                        let actionTop = inning.top.action;
+
+                        if (actionBot) {
+                          if (!actionBot.length) {
+                            translateAction(inputArray[0], awayTeam, awayLeague, actionBot);
+                          } else {
+                            actionBot.forEach(action => {
+                              translateAction(inputArray[0], awayTeam, awayLeague, action);
+                            });
+
+                          }
+                        }
+
+                        if (actionTop) {
+                          if (!actionTop.length) {
+                            translateAction(inputArray[0], homeTeam, homeLeague, actionTop);
+                          } else {
+                            actionTop.forEach(action => {
+                              translateAction(inputArray[0], homeTeam, homeLeague, action);
+                            });
+
+                          }
+                        }
+
+                      });
+
+                    });
+
+                });
+              }
+
+            });
+          }
+        resolve(inputArray);
+      });
+
     }
-
-    // function calcSeasonTotals(inputArray) {
-    //   return new Promise((resolve, reject) => {
-    //
-    //     for (var i = moment("20160403", "YYYYMMDD"); i < moment("20161003", "YYYYMMDD"); i.add(1, 'days')) {
-    //
-    //       let date = i.format().split('-');
-    //       let dayTime = date[2].split('T');
-    //
-    //       let month = date[1];
-    //
-    //       let day = dayTime[0];
-    //
-    //       MainService.getGamesForDay(month, day)
-    //         .then(results => {
-    //           let gamesArray = results.data.data.games.game;
-    //
-    //           if (gamesArray) {
-    //
-    //             gamesArray.forEach((game, index) => {
-    //
-    //               if (game.game_type !== 'R' || game.status !== 'Final') {
-    //                 gamesArray.splice(index, 1);
-    //               }
-    //
-    //               let gameDataUrl = gamesArray[index].game_data_directory;
-    //
-    //               let gameHomeTeam = gamesArray[index].home_team_name;
-    //
-    //               let gameAwayTeam = gamesArray[index].away_team_name;
-    //
-    //               MainService.getGameStats(gameDataUrl)
-    //                 .then(gameData => {
-    //                   let game = gameData.data.data.game;
-    //
-    //                   let homeTeam;
-    //                   let awayTeam;
-    //                   let homeLeague;
-    //                   let awayLeague;
-    //
-    //                   for (var i = 0; i < inputArray.length; i++) {
-    //                     if (inputArray[i].name === gameHomeTeam) {
-    //                       homeTeam = inputArray[i];
-    //                     }
-    //                     if (inputArray[i].name === gameAwayTeam) {
-    //                       awayTeam = inputArray[i];
-    //                     }
-    //                   }
-    //
-    //                   if (homeTeam.league === 'AL') {
-    //                     homeLeague = inputArray[1];
-    //                   } else {
-    //                     homeLeague = inputArray[2];
-    //                   }
-    //
-    //                   if (awayTeam.league === 'AL') {
-    //                     awayLeague = inputArray[1];
-    //                   } else {
-    //                     awayLeague = inputArray[2];
-    //                   }
-    //
-    //                   game.inning.forEach(inning => {
-    //                     let actionBot = inning.bottom.action;
-    //                     let actionTop = inning.top.action;
-    //
-    //                     if (actionBot) {
-    //                       if (!actionBot.length) {
-    //                         translateAction(inputArray[0], awayTeam, awayLeague, actionBot);
-    //                       } else {
-    //                         actionBot.forEach(action => {
-    //                           translateAction(inputArray[0], awayTeam, awayLeague, action);
-    //                         });
-    //
-    //                       }
-    //                     }
-    //
-    //                     if (actionTop) {
-    //                       if (!actionTop.length) {
-    //                         translateAction(inputArray[0], homeTeam, homeLeague, actionTop);
-    //                       } else {
-    //                         actionTop.forEach(action => {
-    //                           translateAction(inputArray[0], homeTeam, homeLeague, action);
-    //                         });
-    //
-    //                       }
-    //                     }
-    //
-    //                   });
-    //
-    //                 });
-    //
-    //             });
-    //           }
-    //
-    //         });
-    //       }
-    //     resolve(inputArray);
-    //   });
-    //
-    // }
 
     function calcAverages(inputArray) {
       return new Promise((resolve, reject) => {
         inputArray.forEach(team => {
           if (team.name === 'Major League Baseball') {
-            team.avgAllVisitsPerGame = team.totalAllVisits / 4860;
-            team.avgChangesPerGame = team.totalChangesOnly / 4860;
-            team.avgPureVisitsPerGame = team.totalPureVisits / 4860;
+            team.avgAllVisitsPerGame = parseInt(team.totalAllVisits) / 4860;
+            team.avgChangesPerGame = parseInt(team.totalChangesOnly) / 4860;
+            team.avgPureVisitsPerGame = parseInt(team.totalPureVisits) / 4860;
           } else if (team.name === 'National League' || team.name === 'American League') {
-            team.avgAllVisitsPerGame = team.totalAllVisits / 2430;
-            team.avgChangesPerGame = team.totalChangesOnly / 2430;
-            team.avgPureVisitsPerGame = team.totalPureVisits / 2430;
+            team.avgAllVisitsPerGame = parseInt(team.totalAllVisits) / 2430;
+            team.avgChangesPerGame = parseInt(team.totalChangesOnly) / 2430;
+            team.avgPureVisitsPerGame = parseInt(team.totalPureVisits) / 2430;
 
           } else {
-            team.avgAllVisitsPerGame = team.totalAllVisits / 162;
-            team.avgChangesPerGame = team.totalChangesOnly / 162;
-            team.avgPureVisitsPerGame = team.totalPureVisits / 162;
+            team.avgAllVisitsPerGame = parseInt(team.totalAllVisits) / 162;
+            team.avgChangesPerGame = parseInt(team.totalChangesOnly) / 162;
+            team.avgPureVisitsPerGame = parseInt(team.totalPureVisits) / 162;
 
           }
         });
